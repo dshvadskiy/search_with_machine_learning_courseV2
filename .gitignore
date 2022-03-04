@@ -130,3 +130,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+.idea/
+datasets/
+opensearch/ltr_toy_model.png
+ltr_output/
+week3/computer_products/
+week3/phone_products/
+product_data/

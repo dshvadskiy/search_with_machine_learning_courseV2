@@ -226,7 +226,7 @@ if __name__ == "__main__":
     # Impressions are candidate queries with *simulated* ranks added to them as well as things like number of impressions
     # and click counts.  Impressions are what we use to then generate training data.  In the real world, you wouldn't
     # need to do this because you would be logging both clicked and unclicked events.
-    # TLDR: we are trying to build a dataset that approximates what Best Buy search looked like back when this data was captured.
+    # TLDR: we are trying to build a datasets that approximates what Best Buy search looked like back when this data was captured.
     # We have two approaches to impressions:
     # 1) We synthesize/infer them from the existing clicks, essentially assuming there is a built in position bias in the logs that *roughly* approximates the actual ranking of Best Buy search
     #    back when this data was captured.  Run using --generate_impressions and --synthesize

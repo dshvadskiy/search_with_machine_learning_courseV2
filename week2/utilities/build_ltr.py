@@ -5,7 +5,8 @@
 ###
 
 import warnings
-warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 import argparse
 import json
 import os

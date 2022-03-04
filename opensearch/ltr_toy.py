@@ -262,18 +262,21 @@ for query in queries:
         for hit in hits:
             print("Title: {}\n\nBody: {}\n".format(hit['_source']['title'], hit['_source']['body']))
             print("Enter 0 or 1:")
-            input = ""
-            for input in sys.stdin.readline():
-                grade = input.rstrip()
-                if grade == "0" or grade == "1":
-                    judgment = Judgment(query, hit['_id'], hit['_source']['title'], int(grade))
-                    judge_vals.append(judgment)
-                    break
-                elif grade == "skip" or grade == "s":
-                    break
-                elif grade == "exit" or grade == 'e':
-                    input = grade  # set this back to the trimmed grade so we can exit the outer loop.  Very clunky!
-                    break
+            input = "0"
+            if any(set(queries[query].lower().split(' ')).intersection(set(hit['_source']['title'].lower().split(' '))) or
+                   set(queries[query].lower().split(' ')).intersection(set(hit['_source']['body'].lower().split(' ')))):
+                grade = "1"
+            #for input in sys.stdin.readline():
+            grade = input.rstrip()
+            if grade == "0" or grade == "1":
+                judgment = Judgment(query, hit['_id'], hit['_source']['title'], int(grade))
+                judge_vals.append(judgment)
+                break
+            elif grade == "skip" or grade == "s":
+                break
+            elif grade == "exit" or grade == 'e':
+                input = grade  # set this back to the trimmed grade so we can exit the outer loop.  Very clunky!
+                break
             if input == "exit" or input == "e":
                 break  # break out of hits, this is ugly, but OK for what we are doing here
 
@@ -438,4 +441,4 @@ print("Response:\n%s" % json.dumps(response, indent=True))
 model_plot = plot_tree(bst, feat_map_file.name)
 model_plot.figure.savefig("ltr_toy_model.png")
 # If you are running in an environment other than Gitpod that can display things, you can also uncomment the next line:
-# plt.show()
+plt.show()
