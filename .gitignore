@@ -137,3 +137,5 @@ ltr_output/
 week3/computer_products/
 week3/phone_products/
 product_data/
+data/
+fastText-0.9.2/

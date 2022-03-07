@@ -7,6 +7,7 @@ import glob
 from opensearchpy import OpenSearch
 from opensearchpy.helpers import bulk
 import logging
+import json
 
 
 logger = logging.getLogger(__name__)
@@ -95,8 +96,10 @@ def get_opensearch():
 
 @click.command()
 @click.option('--source_dir', '-s', help='XML files source directory')
-def main(source_dir):
-    index_name = 'bbuy_products'
+@click.option('--index_name', '-i', default='bbuy_products', help='index to create')
+@click.option('--enrich', '-e', default=True, help='Enrich with synonyms')
+def main(source_dir: str, index_name: str, enrich: bool):
+    #index_name = 'bbuy_products'
     client = get_opensearch()
     files = glob.glob(source_dir + "/*.xml")
     docs_indexed = 0
@@ -115,6 +118,14 @@ def main(source_dir):
             #print(doc)
             if not 'productId' in doc or len(doc['productId']) == 0:
                 continue
+            if enrich:
+                req_data = {'name': doc['name'][0], 'sku': doc['sku'][0]}
+                resp = requests.post(url='http://127.0.0.1:5000/documents/annotate', data=json.dumps(req_data),
+                                     headers={'Content-type': 'application/json', 'Accept': 'application/json'})
+                json_out = resp.json()
+                if 'name_synonyms' in json_out:
+                    doc['name_synonyms'] = json_out['name_synonyms']
+
 
             docs.append({'_index': index_name, '_id':doc['sku'][0], '_source' : doc})
             #docs.append({'_index': index_name, '_source': doc})
