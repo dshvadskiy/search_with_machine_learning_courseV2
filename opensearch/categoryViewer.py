@@ -3,7 +3,7 @@ import os
 import xml.etree.ElementTree as ET
 
 # Location for category data
-categoriesFilename = '/workspace/datasets/product_data/categories/categories_0001_abcat0010000_to_pcmcat99300050000.xml'
+categoriesFilename = '../datasets/product_data/categories/categories_0001_abcat0010000_to_pcmcat99300050000.xml'
 
 # Optional arg to specify max depth of category tree
 maxDepth = 0
