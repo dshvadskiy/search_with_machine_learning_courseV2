@@ -57,8 +57,20 @@ def process_filters(filters_input):
     return filters, display_filters, applied_filters
 
 def get_query_category(user_query, query_class_model):
-    print("IMPLEMENT ME: get_query_category")
-    return None
+    pred = query_class_model.predict(user_query, k=5)
+    i = 0
+    conf = 0.0
+    labels = []
+    while i < 5 and conf < 0.5:
+        label = pred[0][i].replace('__label__', '')
+        labels.append(label)
+        conf += pred[1][i]
+        print(f'query: {user_query};  label: {label}; confidence: {pred[1][i]:.2}')
+        i += 1
+    if conf >= 0.5:
+        return labels
+    else:
+        return None
 
 
 @bp.route('/query', methods=['GET', 'POST'])
@@ -136,10 +148,16 @@ def query():
         query_obj = qu.create_query("*", "", [], sort, sortDir, size=100)
 
     query_class_model = current_app.config["query_model"]
-    query_category = get_query_category(user_query, query_class_model)
-    if query_category is not None:
-        print("IMPLEMENT ME: add this into the filters object so that it gets applied at search time.  This should look like your `term` filter from week 1 for department but for categories instead")
-    #print("query obj: {}".format(query_obj))
+    query_categories = get_query_category(user_query, query_class_model)
+    if query_categories is not None:
+        categories = ' OR '.join(query_categories)
+        if categories.endswith(' OR '):
+            categories = categories[:-len(' OR ')]
+        if query_obj['query']['bool']['filter']:
+            query_obj['query']['bool']['filter'].append({"query_string":  {"default_field": "categoryLeaf", "query": categories}})
+        else:
+            query_obj['query']['bool']['filter'] = [{"query_string":  {"default_field": "categoryLeaf", "query": categories}}]
+    print("query obj: {}".format(query_obj))
     response = opensearch.search(body=query_obj, index=current_app.config["index_name"], explain=explain)
     # Postprocess results here if you so desire
 
@@ -147,7 +165,7 @@ def query():
     if error is None:
         return render_template("search_results.jinja2", query=user_query, search_response=response,
                                display_filters=display_filters, applied_filters=applied_filters,
-                               sort=sort, sortDir=sortDir, model=model, explain=explain, query_category=query_category)
+                               sort=sort, sortDir=sortDir, model=model, explain=explain, query_category=query_categories)
     else:
         redirect(url_for("index"))
 

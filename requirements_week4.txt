@@ -12,3 +12,4 @@ graphviz
 matplotlib
 fasttext
 nltk
+clean-text
